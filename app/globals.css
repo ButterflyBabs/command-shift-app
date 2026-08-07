@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --ivory:#FBF7EF; --indigo:#1F315B; }
+
+html { scroll-behavior: smooth; }
+body {
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(201,190,221,.22) 0%, rgba(201,190,221,0) 55%),
+    linear-gradient(180deg,#fbf7ef 0%, #f2ead9 100%);
+  color: var(--indigo);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+}
+
+.bg-watercolor-deep {
+  background:
+    radial-gradient(60% 80% at 15% 12%, rgba(94,59,108,.55) 0, rgba(94,59,108,0) 60%),
+    radial-gradient(52% 60% at 85% 18%, rgba(46,124,131,.45) 0, rgba(46,124,131,0) 60%),
+    radial-gradient(70% 90% at 70% 92%, rgba(212,175,99,.30) 0, rgba(212,175,99,0) 55%),
+    linear-gradient(160deg,#1f315b 0%, #16233f 100%);
+}
+.bg-watercolor-soft {
+  background:
+    radial-gradient(50% 60% at 10% 0%, rgba(201,190,221,.5) 0, rgba(201,190,221,0) 55%),
+    radial-gradient(45% 55% at 95% 15%, rgba(212,175,99,.22) 0, rgba(212,175,99,0) 55%),
+    linear-gradient(180deg,#fbf7ef 0%, #f4ecdd 100%);
+}
+.text-balance { text-wrap: balance; }
+.card-hover { transition: transform .3s ease, box-shadow .3s ease; }
+.card-hover:hover { transform: translateY(-4px); }
