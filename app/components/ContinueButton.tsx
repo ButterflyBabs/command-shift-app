@@ -26,10 +26,10 @@ export function ContinueButton() {
 
   return (
     <Link
-      href={next ? `/day/${next}` : "/day/1"}
+      href={next ? `/day/${next}` : "/register"}
       className="mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-[30px] py-[15px] text-[15px] font-semibold text-indigo-deep shadow-soft transition hover:bg-gold-soft"
     >
-      {next ? `Continue — Day ${next} →` : "Begin Day 1 →"}
+      {next ? `Continue — Day ${next} →` : "Register free →"}
     </Link>
   );
 }
