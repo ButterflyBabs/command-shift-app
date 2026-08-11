@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "The Command Shift — 21-Day Challenge",
   description:
-    "From a scattered hustle to a soft landing — one clear command center where your mission, brand, and business align, on purpose. A free 21-day challenge for founders and coaches.",
+    "From a scattered hustle to hard-won harmony — one clear command center where your mission, brand, and business align, on purpose. A free 21-day challenge for founders and coaches.",
   openGraph: {
     title: "The Command Shift — 21-Day Challenge",
     description:

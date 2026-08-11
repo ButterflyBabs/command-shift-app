@@ -42,7 +42,7 @@ export default function Home() {
               Welcome to The Command Shift.
             </h1>
             <p className="mx-auto mt-4 max-w-[620px] text-[18px] leading-relaxed text-ivory/80">
-              Over the next 21 days, you&apos;ll move from a scattered hustle to a soft landing — one clear command
+              Over the next 21 days, you&apos;ll move from a scattered hustle to hard-won harmony — one clear command
               center where your mission, brand, and business finally align, on purpose.
             </p>
             <ContinueButton />
