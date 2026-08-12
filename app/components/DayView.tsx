@@ -33,6 +33,9 @@ import {
   syncLocalToCloud,
   loadOutput,
   saveOutput,
+  getStartDate,
+  unlockedThrough,
+  unlockLabel,
 } from "@/lib/store";
 import {
   Compass,
@@ -191,10 +194,50 @@ function JournalBlock({
   );
 }
 
+/* ---------------- locked (future day) ---------------- */
+function LockedDay({ day, startISO }: { day: Day; startISO: string }) {
+  const unlocked = unlockedThrough(startISO);
+  return (
+    <div className="mx-auto max-w-[640px] px-[22px] pb-16 pt-8">
+      <div className="mb-6 flex items-center gap-3 border-b border-indigo/10 px-1 pb-5">
+        <Compass className="h-9 w-9 text-gold" />
+        <div>
+          <h1 className="font-serif text-[clamp(24px,3.6vw,38px)] font-semibold leading-none">The Command Shift</h1>
+          <div className="mt-1.5 font-serif text-[20px] text-gold">Day {day.n} of 21</div>
+        </div>
+      </div>
+
+      <div className="rounded-[26px] border border-indigo/10 bg-white/75 p-9 text-center shadow-card sm:p-12">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-gold/50 bg-white/70">
+          <IconMoon className="h-8 w-8 text-gold" />
+        </div>
+        <h2 className="font-serif text-[26px] font-semibold text-indigo">This day is still ahead 🦋</h2>
+        <p className="mt-3 leading-relaxed text-indigo/75">
+          The Command Shift moves one day at a time — on purpose. Day {day.n} opens{" "}
+          <strong className="text-indigo">{unlockLabel(startISO, day.n)}</strong>.
+        </p>
+        <p className="mt-4 leading-relaxed text-indigo/70">
+          Rushing ahead is the very hustle we&apos;re leaving behind. Let today&apos;s work settle in before the next
+          step arrives. Today, do today.
+        </p>
+        <Link
+          href={`/day/${unlocked}`}
+          className="mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 text-[15px] font-semibold text-indigo-deep shadow-soft transition hover:bg-gold-soft"
+        >
+          Go to today — Day {unlocked} →
+        </Link>
+        <p className="mt-6 font-serif text-plum">Head Up — Wings Out.</p>
+      </div>
+    </div>
+  );
+}
+
 /* ---------------- main ---------------- */
 export function DayView({ day }: { day: Day }) {
   const [uid, setUid] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [startISO, setStartISO] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(21);
   const [order, setOrder] = useState<string[]>(DEFAULT_ORDER);
   const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [reflectText, setReflectText] = useState("");
@@ -215,6 +258,10 @@ export function DayView({ day }: { day: Day }) {
       if (!alive) return;
       setUid(id);
       if (id) await syncLocalToCloud(id);
+      const start = await getStartDate(id);
+      if (!alive) return;
+      setStartISO(start);
+      setUnlocked(unlockedThrough(start));
       const [prog, layout, r, e, mv, ov] = await Promise.all([
         loadProgress(id),
         loadLayout(id),
@@ -343,12 +390,30 @@ export function DayView({ day }: { day: Day }) {
             {Array.from({ length: TOTAL }, (_, i) => i + 1).map((i) => {
               const done = !!completed[i];
               const current = i === day.n;
+              const locked = i > unlocked;
               const base = "flex h-[34px] w-[34px] items-center justify-center rounded-full text-xs font-bold border-[1.5px]";
               const cls = done
                 ? "bg-gold border-gold text-white"
                 : current
                 ? "bg-indigo border-indigo text-white"
+                : locked
+                ? "border-indigo/15 text-indigo/25"
                 : "border-indigo/20 text-indigo/45";
+              if (locked) {
+                return (
+                  <span
+                    key={i}
+                    title={startISO ? `Opens ${unlockLabel(startISO, i)}` : "Still ahead"}
+                    className={`${base} ${cls} cursor-not-allowed`}
+                    aria-disabled="true"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-[13px] w-[13px]" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <rect x="5" y="11" width="14" height="9" rx="2" />
+                      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                    </svg>
+                  </span>
+                );
+              }
               return (
                 <Link key={i} href={`/day/${i}`} className={`${base} ${cls} ${current ? "ring-2 ring-gold/45" : ""}`}>
                   {done ? "✓" : i}
@@ -421,6 +486,21 @@ export function DayView({ day }: { day: Day }) {
     },
   };
 
+  if (!mounted) {
+    return (
+      <div className="mx-auto flex max-w-[640px] items-center justify-center px-[22px] py-24 text-indigo/55">
+        <div className="flex items-center gap-3">
+          <Compass className="h-6 w-6 animate-pulse text-gold" />
+          <span className="text-sm">Opening your day…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (day.n > unlocked && startISO) {
+    return <LockedDay day={day} startISO={startISO} />;
+  }
+
   return (
     <div className="mx-auto max-w-[1180px] px-[22px] pb-16 pt-8">
       {/* header */}
@@ -490,9 +570,20 @@ export function DayView({ day }: { day: Day }) {
         )}
         <Link href="/journal" className="text-[13px] font-semibold text-teal hover:text-plum">My Journal</Link>
         {day.n < 21 ? (
-          <Link href={`/day/${day.n + 1}`} className="rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-indigo-deep shadow-soft hover:bg-gold-soft">
-            Day {day.n + 1} →
-          </Link>
+          day.n + 1 <= unlocked ? (
+            <Link href={`/day/${day.n + 1}`} className="rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-indigo-deep shadow-soft hover:bg-gold-soft">
+              Day {day.n + 1} →
+            </Link>
+          ) : (
+            <span
+              className="rounded-full border border-indigo/15 px-5 py-2.5 text-right text-[13px] font-semibold leading-tight text-indigo/45"
+              title={startISO ? `Opens ${unlockLabel(startISO, day.n + 1)}` : "Still ahead"}
+            >
+              Day {day.n + 1} opens
+              <br />
+              <span className="text-indigo/60">{startISO ? unlockLabel(startISO, day.n + 1) : "tomorrow"}</span>
+            </span>
+          )
         ) : (
           <Link href="/" className="rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-indigo-deep shadow-soft hover:bg-gold-soft">
             Finish → Home

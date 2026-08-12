@@ -46,6 +46,11 @@ export function LoginForm() {
         <p className="mt-3 leading-relaxed text-indigo/75">
           We sent a sign-in link to <strong>{email}</strong>. Tap it to pick up your Command Shift on this device.
         </p>
+        <div className="mt-4 rounded-2xl border border-gold/40 bg-gold/[0.06] px-5 py-3 text-left text-[13px] leading-relaxed text-indigo/80">
+          Look for an email from <strong>The Command Shift</strong> · lccssupport@amilynnecarroll.com. ⭐ Add that
+          address to your contacts so it doesn&apos;t go to spam — and check <strong>Spam / Promotions</strong> if it&apos;s
+          not there within a minute.
+        </div>
       </div>
     );
   }

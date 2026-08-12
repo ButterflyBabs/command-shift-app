@@ -172,6 +172,55 @@ export async function saveOutput(uid: string | null, key: string, valueText: str
   localStorage.setItem(okey(key), valueText);
 }
 
+/* ---------- drip: one day at a time ---------- */
+function localDateISO(d = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** The participant's start date (YYYY-MM-DD). From cs_participants when signed in; else local. */
+export async function getStartDate(uid: string | null): Promise<string> {
+  if (uid) {
+    const { data } = await createClient()
+      .from("cs_participants")
+      .select("start_date")
+      .eq("user_id", uid)
+      .maybeSingle();
+    if (data?.start_date) {
+      try {
+        localStorage.setItem("cs_start", data.start_date as string);
+      } catch {}
+      return data.start_date as string;
+    }
+  }
+  try {
+    let d = localStorage.getItem("cs_start");
+    if (!d) {
+      d = localDateISO();
+      localStorage.setItem("cs_start", d);
+    }
+    return d;
+  } catch {
+    return localDateISO();
+  }
+}
+
+/** Highest day number currently unlocked (1..21), by calendar days since start. */
+export function unlockedThrough(startISO: string): number {
+  const [y, m, d] = startISO.split("-").map(Number);
+  const start = new Date(y, (m || 1) - 1, d || 1);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.floor((today.getTime() - start.getTime()) / 86400000);
+  return Math.max(1, Math.min(days + 1, 21));
+}
+
+/** Friendly date a given day unlocks (e.g., "Monday, Aug 18"). */
+export function unlockLabel(startISO: string, dayN: number): string {
+  const [y, m, d] = startISO.split("-").map(Number);
+  const dt = new Date(y, (m || 1) - 1, (d || 1) + (dayN - 1));
+  return dt.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+}
+
 /* ---------- one-time sync of anonymous localStorage → cloud ---------- */
 export async function syncLocalToCloud(uid: string) {
   if (!uid) return;

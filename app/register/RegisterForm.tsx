@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Butterfly } from "../components/icons";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,6 +21,20 @@ type Fields = {
 };
 
 const EMPTY: Fields = { firstName: "", lastName: "", city: "", state: "", zip: "", phone: "", email: "" };
+
+/** Best-effort "open your inbox" link based on the email's provider. */
+function inboxLink(email: string): { label: string; href: string } | null {
+  const d = (email.split("@")[1] || "").toLowerCase();
+  if (d.includes("gmail") || d.includes("googlemail"))
+    return { label: "Open Gmail", href: "https://mail.google.com/mail/u/0/#search/from%3A(lccssupport%40amilynnecarroll.com)" };
+  if (d.includes("outlook") || d.includes("hotmail") || d.includes("live") || d.includes("msn"))
+    return { label: "Open Outlook", href: "https://outlook.live.com/mail/0/" };
+  if (d.includes("yahoo")) return { label: "Open Yahoo Mail", href: "https://mail.yahoo.com/" };
+  if (d.includes("icloud") || d.includes("me.com") || d.includes("mac.com"))
+    return { label: "Open iCloud Mail", href: "https://www.icloud.com/mail/" };
+  if (d.includes("aol")) return { label: "Open AOL Mail", href: "https://mail.aol.com/" };
+  return null;
+}
 
 export function RegisterForm() {
   const [f, setF] = useState<Fields>(EMPTY);
@@ -81,22 +94,47 @@ export function RegisterForm() {
   }
 
   if (status === "done") {
+    const inbox = inboxLink(f.email);
     return (
       <div className="mx-auto max-w-md rounded-[26px] border border-indigo/10 bg-white/80 p-10 text-center shadow-card">
         <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-gold/50 bg-white/70">
           <Butterfly className="h-10 w-12 text-gold" />
         </div>
-        <h2 className="font-serif text-3xl font-semibold text-indigo">You&apos;re in{f.firstName ? `, ${f.firstName}` : ""}. 🦋</h2>
+        <h2 className="font-serif text-3xl font-semibold text-indigo">
+          One last step{f.firstName ? `, ${f.firstName}` : ""} 🦋
+        </h2>
         <p className="mt-3 leading-relaxed text-indigo/75">
-          Welcome to The Command Shift. You can begin right now. We also emailed you a one-tap sign-in link —
-          tap it to save your progress and journals across every device. (Check spam, just in case.)
+          Check your email to begin. We just sent a secure link to <strong className="text-indigo">{f.email}</strong> —
+          tap it to open Day 1 and start The Command Shift.
         </p>
-        <Link
-          href="/day/1"
-          className="mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 text-[15px] font-semibold text-indigo-deep shadow-soft transition hover:bg-gold-soft"
-        >
-          Begin Day 1 →
-        </Link>
+
+        <div className="mt-5 rounded-2xl border border-gold/40 bg-gold/[0.06] px-5 py-4 text-left">
+          <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-gold">Look for this email</p>
+          <p className="mt-2 text-[14px] leading-relaxed text-indigo/85">
+            <span className="text-indigo/60">From:</span> <strong>The Command Shift</strong> ·
+            lccssupport@amilynnecarroll.com
+            <br />
+            <span className="text-indigo/60">Subject:</span> <strong>Confirm your sign-in</strong>
+          </p>
+          <p className="mt-3 rounded-xl border border-teal/30 bg-teal/[0.07] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-indigo/85">
+            ⭐ <strong>Add lccssupport@amilynnecarroll.com to your contacts</strong> (or tap &ldquo;Not spam&rdquo; if it
+            lands there) so every day&apos;s email reaches your inbox.
+          </p>
+          <p className="mt-2 text-[12.5px] leading-relaxed text-indigo/55">
+            Arrives within a minute. If you don&apos;t see it, check <strong>Spam</strong> and <strong>Promotions</strong>.
+          </p>
+        </div>
+
+        {inbox && (
+          <a
+            href={inbox.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 text-[15px] font-semibold text-indigo-deep shadow-soft transition hover:bg-gold-soft"
+          >
+            {inbox.label} →
+          </a>
+        )}
         <p className="mt-5 font-serif text-plum">Head Up — Wings Out.</p>
       </div>
     );

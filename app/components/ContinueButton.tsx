@@ -2,34 +2,43 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getUserId } from "@/lib/supabase/client";
+import { getStartDate, unlockedThrough } from "@/lib/store";
 
 export function ContinueButton() {
-  const [next, setNext] = useState<number | null>(null);
+  const [href, setHref] = useState<string>("/register");
+  const [label, setLabel] = useState<string>("Register free →");
 
   useEffect(() => {
-    try {
-      const p = localStorage.getItem("cs_progress");
-      if (p) {
-        const done = JSON.parse(p) as Record<string, boolean>;
-        const completedDays = Object.keys(done)
-          .filter((k) => done[k])
-          .map(Number);
-        if (completedDays.length) {
-          const highest = Math.max(...completedDays);
-          setNext(Math.min(highest + 1, 21));
-        }
+    let alive = true;
+    (async () => {
+      try {
+        const uid = await getUserId();
+        // A start date exists (cloud row, or a locally-stored one) only once
+        // someone has actually begun. New visitors → registration.
+        const hasLocalStart =
+          typeof localStorage !== "undefined" && !!localStorage.getItem("cs_start");
+        if (!uid && !hasLocalStart) return;
+        const start = await getStartDate(uid);
+        if (!alive) return;
+        const today = unlockedThrough(start);
+        setHref(`/day/${today}`);
+        setLabel(today === 1 ? "Begin — Day 1 →" : `Continue — Day ${today} →`);
+      } catch {
+        /* ignore — default to register */
       }
-    } catch {
-      /* ignore */
-    }
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   return (
     <Link
-      href={next ? `/day/${next}` : "/register"}
+      href={href}
       className="mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-[30px] py-[15px] text-[15px] font-semibold text-indigo-deep shadow-soft transition hover:bg-gold-soft"
     >
-      {next ? `Continue — Day ${next} →` : "Register free →"}
+      {label}
     </Link>
   );
 }
