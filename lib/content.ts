@@ -47,3 +47,21 @@ export const DAYS: Day[] = [
 ];
 
 export const getDay = (n: number): Day | undefined => DAYS.find((d) => d.n === n);
+
+/**
+ * Structured outputs captured on specific days. These save to cs_outputs and become
+ * the seed for the Command Suite assessments (Soul/Brain, Offer, Revenue, Brand, Positioning…).
+ */
+export type DayOutput = { key: string; label: string; placeholder: string };
+export const DAY_OUTPUT: Record<number, DayOutput> = {
+  2: { key: "mission_line", label: "Your mission line", placeholder: "Why this business exists — one honest sentence…" },
+  3: { key: "command_audit", label: "Your Command Audit — two lowest areas", placeholder: "The two areas you circled, and a note on each…" },
+  5: { key: "true_north", label: "Your True North (this season)", placeholder: "One clear destination for the next 90 days…" },
+  8: { key: "offer", label: "Your core offer", placeholder: "Who it's for · the transformation · why it's worth it…" },
+  9: { key: "revenue_friction", label: "Your #1 revenue friction", placeholder: "The one point in your buying path costing you the most…" },
+  10: { key: "first_system", label: "The system you built", placeholder: "The repeatable checklist, template, or rule…" },
+  11: { key: "brand_voice", label: "Your brand voice", placeholder: "Three words + a line in your true voice…" },
+  12: { key: "positioning", label: "Your positioning line", placeholder: "I'm the ___ for ___ who want ___…" },
+  18: { key: "operating_intention", label: "Your operating intention", placeholder: "How you choose to lead this season…" },
+};
+export const getDayOutput = (n: number): DayOutput | undefined => DAY_OUTPUT[n];

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Butterfly } from "../components/icons";
+import { createClient } from "@/lib/supabase/client";
 
 const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
@@ -44,12 +45,36 @@ export function RegisterForm() {
     }
     setStatus("busy");
     try {
+      // 1) Marketing/CRM: fire the Global Control tag + write contact fields (best-effort).
       await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(f),
       });
-      setStatus("done"); // capture is best-effort; always confirm
+      // 2) Account: create the shared Supabase identity + email a magic link.
+      //    Their details ride along as user_metadata; progress saves once they sign in.
+      try {
+        const redirectTo =
+          typeof window !== "undefined" ? `${window.location.origin}/auth/callback?next=/day/1` : undefined;
+        await createClient().auth.signInWithOtp({
+          email: f.email,
+          options: {
+            emailRedirectTo: redirectTo,
+            shouldCreateUser: true,
+            data: {
+              first_name: f.firstName,
+              last_name: f.lastName,
+              phone: f.phone,
+              city: f.city,
+              state: f.state,
+              zip: f.zip,
+            },
+          },
+        });
+      } catch {
+        /* account creation is best-effort; they can still start now */
+      }
+      setStatus("done");
     } catch {
       setStatus("done");
     }
@@ -63,8 +88,8 @@ export function RegisterForm() {
         </div>
         <h2 className="font-serif text-3xl font-semibold text-indigo">You&apos;re in{f.firstName ? `, ${f.firstName}` : ""}. 🦋</h2>
         <p className="mt-3 leading-relaxed text-indigo/75">
-          Welcome to The Command Shift. Day 1 is on its way to your inbox and phone — and you can begin right now.
-          Check your email (and spam, just in case) for your daily lessons.
+          Welcome to The Command Shift. You can begin right now. We also emailed you a one-tap sign-in link —
+          tap it to save your progress and journals across every device. (Check spam, just in case.)
         </p>
         <Link
           href="/day/1"
