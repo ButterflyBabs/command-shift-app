@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Butterfly } from "../components/icons";
+import { Emblem } from "../components/icons";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -40,7 +40,7 @@ export function LoginForm() {
     return (
       <div className="mx-auto max-w-md rounded-[26px] border border-indigo/10 bg-white/80 p-10 text-center shadow-card">
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-gold/50 bg-white/70">
-          <Butterfly className="h-8 w-10 text-gold" />
+          <Emblem className="h-12 w-12" />
         </div>
         <h2 className="font-serif text-2xl font-semibold text-indigo">Check your email 🦋</h2>
         <p className="mt-3 leading-relaxed text-indigo/75">

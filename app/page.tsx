@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Compass, Butterfly } from "./components/icons";
+import { Emblem } from "./components/icons";
 import { ContinueButton } from "./components/ContinueButton";
 
 function Eyebrow({ children }: { children: ReactNode }) {
@@ -13,7 +13,7 @@ function Nav() {
     <header className="sticky top-0 z-40 border-b border-indigo/10 bg-ivory/90 backdrop-blur">
       <div className="mx-auto flex max-w-[1180px] items-center justify-between px-[22px] py-3.5">
         <div className="flex items-center gap-2.5">
-          <Compass className="h-8 w-8 text-gold" />
+          <Emblem className="h-9 w-9" />
           <div>
             <div className="font-serif text-[19px] font-semibold tracking-wide leading-none">LifeCharter</div>
             <div className="mt-0.5 text-[9px] uppercase tracking-[0.32em] text-indigo/55">Command Suite</div>
@@ -32,9 +32,17 @@ export default function Home() {
       <div className="mx-auto max-w-[1180px] px-[22px] pb-16">
         {/* hero */}
         <section className="bg-watercolor-deep relative mt-8 overflow-hidden rounded-[26px] px-6 py-14 text-center text-ivory shadow-soft sm:px-10">
-          <Butterfly className="pointer-events-none absolute -right-5 top-6 h-48 w-56 animate-floaty text-gold/15" />
-          <Compass className="pointer-events-none absolute -left-10 bottom-0 h-64 w-64 text-lavender/10" />
+          <Emblem className="pointer-events-none absolute -left-10 bottom-0 h-64 w-64 opacity-[0.07]" />
           <div className="relative animate-fadeUp">
+            <div className="mb-7 flex flex-col items-center">
+              <Emblem className="h-20 w-20 drop-shadow-[0_4px_16px_rgba(0,0,0,0.25)] sm:h-24 sm:w-24" />
+              <div className="mt-3 font-serif text-[26px] font-semibold leading-none text-gold-soft sm:text-[30px]">
+                LifeCharter
+              </div>
+              <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.34em] text-ivory/70">
+                Command Suite
+              </div>
+            </div>
             <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-gold">
               The Command Shift · 21-Day Challenge
             </p>
@@ -133,7 +141,7 @@ export default function Home() {
         <Eyebrow>Meet your Alignment Architect</Eyebrow>
         <div className="mx-auto max-w-[620px] text-center">
           <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full border border-gold/50 bg-white/60">
-            <Butterfly className="h-11 w-14 text-gold" />
+            <Emblem className="h-16 w-16" />
           </div>
           <p className="text-[16px] leading-relaxed text-indigo/75">
             {/* Replace with Babs's real bio + headshot */}

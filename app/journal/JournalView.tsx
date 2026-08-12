@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getUserId } from "@/lib/supabase/client";
 import { loadAllJournals, type EntryType } from "@/lib/store";
 import { DAYS } from "@/lib/content";
-import { Compass } from "../components/icons";
+import { Emblem } from "../components/icons";
 
 const LABEL: Record<EntryType, string> = {
   reflection: "Reflection",
@@ -39,7 +39,7 @@ export function JournalView() {
     <div className="mx-auto max-w-[820px] px-[22px] pb-20 pt-8">
       <div className="mb-6 flex items-center justify-between border-b border-indigo/10 pb-5">
         <div className="flex items-center gap-3">
-          <Compass className="h-8 w-8 text-gold" />
+          <Emblem className="h-9 w-9" />
           <div>
             <h1 className="font-serif text-[clamp(26px,4vw,38px)] font-semibold leading-none">My Command Shift Journal</h1>
             <p className="mt-2 text-sm text-indigo/70">Everything you&apos;ve written, in one place.</p>

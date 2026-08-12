@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Butterfly } from "../components/icons";
+import { Emblem } from "../components/icons";
 import { createClient } from "@/lib/supabase/client";
 
 const US_STATES = [
@@ -98,7 +98,7 @@ export function RegisterForm() {
     return (
       <div className="mx-auto max-w-md rounded-[26px] border border-indigo/10 bg-white/80 p-10 text-center shadow-card">
         <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-gold/50 bg-white/70">
-          <Butterfly className="h-10 w-12 text-gold" />
+          <Emblem className="h-16 w-16" />
         </div>
         <h2 className="font-serif text-3xl font-semibold text-indigo">
           One last step{f.firstName ? `, ${f.firstName}` : ""} 🦋

@@ -38,7 +38,7 @@ import {
   unlockLabel,
 } from "@/lib/store";
 import {
-  Compass,
+  Emblem,
   IconTarget,
   IconHeadphones,
   IconBook,
@@ -200,7 +200,7 @@ function LockedDay({ day, startISO }: { day: Day; startISO: string }) {
   return (
     <div className="mx-auto max-w-[640px] px-[22px] pb-16 pt-8">
       <div className="mb-6 flex items-center gap-3 border-b border-indigo/10 px-1 pb-5">
-        <Compass className="h-9 w-9 text-gold" />
+        <Emblem className="h-9 w-9" />
         <div>
           <h1 className="font-serif text-[clamp(24px,3.6vw,38px)] font-semibold leading-none">The Command Shift</h1>
           <div className="mt-1.5 font-serif text-[20px] text-gold">Day {day.n} of 21</div>
@@ -490,7 +490,7 @@ export function DayView({ day }: { day: Day }) {
     return (
       <div className="mx-auto flex max-w-[640px] items-center justify-center px-[22px] py-24 text-indigo/55">
         <div className="flex items-center gap-3">
-          <Compass className="h-6 w-6 animate-pulse text-gold" />
+          <Emblem className="h-7 w-7 animate-pulse" />
           <span className="text-sm">Opening your day…</span>
         </div>
       </div>
@@ -506,7 +506,7 @@ export function DayView({ day }: { day: Day }) {
       {/* header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-5 border-b border-indigo/10 px-1 pb-5">
         <div className="flex items-center gap-3">
-          <Compass className="h-9 w-9 text-gold" />
+          <Emblem className="h-9 w-9" />
           <div>
             <h1 className="font-serif text-[clamp(28px,4vw,44px)] font-semibold leading-none">The Command Shift</h1>
             <div className="mt-1.5 font-serif text-[22px] text-gold">Day {day.n} of 21</div>

@@ -1,3 +1,10 @@
+export function Emblem({ className = "" }: { className?: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/lccs-emblem.png" alt="LifeCharter Command Suite" className={className} />
+  );
+}
+
 export function Compass({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
