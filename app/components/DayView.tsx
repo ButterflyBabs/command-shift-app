@@ -51,23 +51,29 @@ import {
 const TOTAL = 21;
 const DEFAULT_ORDER = ["focus", "audio", "reflect", "action", "progress", "intention", "nudge", "evening", "move"];
 
-/* ---------------- demo audio player ---------------- */
-function AudioPlayer({ duration }: { duration: string }) {
-  const total = useMemo(() => {
+/* ---------------- audio player (real audio when audioUrl present) ---------------- */
+function AudioPlayer({ duration, audioUrl }: { duration: string; audioUrl?: string }) {
+  const parsed = useMemo(() => {
     const [m, s] = duration.split(":").map(Number);
-    return m * 60 + s;
+    return (m || 0) * 60 + (s || 0);
   }, [duration]);
+  const isReal = !!audioUrl;
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [pos, setPos] = useState(0);
+  const [total, setTotal] = useState(parsed);
   const [playing, setPlaying] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     setPos(0);
     setPlaying(false);
+    setTotal(parsed);
     if (timer.current) clearInterval(timer.current);
-  }, [duration]);
+  }, [audioUrl, parsed]);
 
+  // demo simulation only when there's no real file
   useEffect(() => {
+    if (isReal) return;
     if (playing) {
       timer.current = setInterval(() => {
         setPos((p) => {
@@ -84,16 +90,56 @@ function AudioPlayer({ duration }: { duration: string }) {
     return () => {
       if (timer.current) clearInterval(timer.current);
     };
-  }, [playing, total]);
+  }, [playing, total, isReal]);
+
+  function toggle() {
+    if (isReal) {
+      const a = audioRef.current;
+      if (!a) return;
+      if (a.paused) a.play();
+      else a.pause();
+    } else {
+      setPlaying((p) => !p);
+    }
+  }
+
+  function seek(e: React.MouseEvent<HTMLDivElement>) {
+    const r = e.currentTarget.getBoundingClientRect();
+    const frac = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    if (isReal && audioRef.current) {
+      const t = frac * (total || parsed);
+      audioRef.current.currentTime = t;
+      setPos(t);
+    } else {
+      setPos(Math.round(frac * total));
+    }
+  }
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  const remaining = Math.max(0, (total || parsed) - pos);
+
   return (
     <div>
+      {isReal && (
+        <audio
+          ref={audioRef}
+          src={audioUrl}
+          preload="metadata"
+          onLoadedMetadata={(e) => {
+            const d = e.currentTarget.duration;
+            if (d && isFinite(d)) setTotal(d);
+          }}
+          onTimeUpdate={(e) => setPos(e.currentTarget.currentTime)}
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onEnded={() => setPlaying(false)}
+        />
+      )}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => setPlaying((p) => !p)}
+          onClick={toggle}
           aria-label={playing ? "Pause" : "Play"}
-          className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-gold shadow-soft"
+          className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-gold shadow-soft transition hover:bg-gold-soft"
         >
           <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] text-indigo-deep" fill="currentColor">
             {playing ? <path d="M7 5h4v14H7zM13 5h4v14h-4z" /> : <path d="M8 5v14l11-7z" />}
@@ -101,16 +147,18 @@ function AudioPlayer({ duration }: { duration: string }) {
         </button>
         <div
           className="relative h-1.5 flex-1 cursor-pointer overflow-hidden rounded-full bg-indigo/15"
-          onClick={(e) => {
-            const r = e.currentTarget.getBoundingClientRect();
-            setPos(Math.round(((e.clientX - r.left) / r.width) * total));
-          }}
+          onClick={seek}
         >
-          <div className="absolute inset-y-0 left-0 bg-gold" style={{ width: `${(pos / total) * 100}%` }} />
+          <div
+            className="absolute inset-y-0 left-0 bg-gold"
+            style={{ width: `${((pos / (total || parsed)) * 100 || 0)}%` }}
+          />
         </div>
-        <div className="min-w-[42px] text-right text-[13px] tabular-nums text-indigo/70">{fmt(total - pos)}</div>
+        <div className="min-w-[42px] text-right text-[13px] tabular-nums text-indigo/70">{fmt(remaining)}</div>
       </div>
-      <p className="mt-2.5 text-center text-xs text-indigo/55">Listen to today&apos;s lesson · demo player (placeholder audio)</p>
+      <p className="mt-2.5 text-center text-xs text-indigo/55">
+        {isReal ? "Listen to today’s lesson with Babs 🦋" : "Audio for this day is coming soon — preview player"}
+      </p>
     </div>
   );
 }
@@ -326,7 +374,7 @@ export function DayView({ day }: { day: Day }) {
         <div>
           <div className="mb-2.5 flex justify-center"><IconHeadphones className="h-9 w-9 text-gold" /></div>
           <div className="mb-3.5 text-center font-serif text-[18px] font-semibold">{day.audioTitle}</div>
-          <AudioPlayer duration={day.audioDuration} />
+          <AudioPlayer duration={day.audioDuration} audioUrl={day.audioUrl} />
         </div>
       ),
     },
