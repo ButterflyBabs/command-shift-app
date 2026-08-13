@@ -6,8 +6,10 @@ import { getUserId } from "@/lib/supabase/client";
 import { getStartDate, unlockedThrough } from "@/lib/store";
 
 export function ContinueButton() {
-  const [href, setHref] = useState<string>("/register");
-  const [label, setLabel] = useState<string>("Register free →");
+  // This is the post-registration app home. Default (unrecognized visitor) →
+  // sign in, never register. Recognized/returning → continue to their day.
+  const [href, setHref] = useState<string>("/login");
+  const [label, setLabel] = useState<string>("Sign in to continue →");
 
   useEffect(() => {
     let alive = true;
@@ -15,7 +17,7 @@ export function ContinueButton() {
       try {
         const uid = await getUserId();
         // A start date exists (cloud row, or a locally-stored one) only once
-        // someone has actually begun. New visitors → registration.
+        // someone has actually begun on this device/account.
         const hasLocalStart =
           typeof localStorage !== "undefined" && !!localStorage.getItem("cs_start");
         if (!uid && !hasLocalStart) return;
@@ -25,7 +27,7 @@ export function ContinueButton() {
         setHref(`/day/${today}`);
         setLabel(today === 1 ? "Begin — Day 1 →" : `Continue — Day ${today} →`);
       } catch {
-        /* ignore — default to register */
+        /* ignore — default to sign in */
       }
     })();
     return () => {

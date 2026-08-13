@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { Emblem } from "./components/icons";
 import { ContinueButton } from "./components/ContinueButton";
 
@@ -32,11 +31,7 @@ export default function Home() {
       <Nav />
       <div className="mx-auto max-w-[1180px] px-[22px] pb-16">
         {/* hero */}
-        <Link
-          href="/register"
-          aria-label="Register free for The Command Shift"
-          className="bg-watercolor-deep group relative mt-8 block cursor-pointer overflow-hidden rounded-[26px] px-6 py-14 text-center text-ivory shadow-soft transition hover:shadow-lg sm:px-10"
-        >
+        <section className="bg-watercolor-deep relative mt-8 overflow-hidden rounded-[26px] px-6 py-14 text-center text-ivory shadow-soft sm:px-10">
           <Emblem className="pointer-events-none absolute -left-10 bottom-0 h-64 w-64 opacity-[0.07]" />
           <div className="relative animate-fadeUp">
             <div className="mb-7 flex flex-col items-center">
@@ -58,11 +53,9 @@ export default function Home() {
               Over the next 21 days, you&apos;ll move from a scattered hustle to hard-won harmony — one clear command
               center where your mission, brand, and business finally align, on purpose.
             </p>
-            <span className="mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-[30px] py-[15px] text-[15px] font-semibold text-indigo-deep shadow-soft transition group-hover:bg-gold-soft">
-              Register free →
-            </span>
+            <ContinueButton />
           </div>
-        </Link>
+        </section>
 
         {/* what to expect */}
         <Eyebrow>What to expect</Eyebrow>
