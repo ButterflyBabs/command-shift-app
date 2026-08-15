@@ -21,6 +21,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { getDayOutput, type Day } from "@/lib/content";
 import { ProgressRing } from "./ProgressRing";
+import { AlignmentCall } from "./AlignmentCall";
 import { getUserId } from "@/lib/supabase/client";
 import {
   loadProgress,
@@ -590,6 +591,9 @@ export function DayView({ day }: { day: Day }) {
           </button>
         </div>
       </div>
+
+      {/* weekly alignment call */}
+      <AlignmentCall />
 
       {/* cards */}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
