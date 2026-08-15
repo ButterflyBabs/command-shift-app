@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Emblem } from "../components/icons";
 
-export function LoginForm() {
+export function LoginForm({ next = "/day/1" }: { next?: string }) {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "busy" | "sent">("idle");
   const [error, setError] = useState("");
@@ -19,7 +19,7 @@ export function LoginForm() {
     setState("busy");
     try {
       const redirectTo =
-        typeof window !== "undefined" ? `${window.location.origin}/auth/callback?next=/day/1` : undefined;
+        typeof window !== "undefined" ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` : undefined;
       const { error } = await createClient().auth.signInWithOtp({
         email,
         options: { emailRedirectTo: redirectTo, shouldCreateUser: true },

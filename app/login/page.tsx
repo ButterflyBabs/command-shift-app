@@ -1,14 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Emblem } from "../components/icons";
 import { LoginForm } from "./LoginForm";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Sign in — The Command Shift",
   description: "Sign in to save your Command Shift progress and journals across devices.",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: { reason?: string; next?: string; error?: string };
+}) {
+  const next = searchParams?.next || "/day/1";
+  // Already signed in? Don't make them sign in again — that's the whole
+  // complaint behind "the link only works once."
+  try {
+    const { data } = await createClient().auth.getUser();
+    if (data.user) redirect(next);
+  } catch {
+    /* not signed in — show the form */
+  }
+
+  // ?error=1 is the legacy value; ?reason=used is what the auth routes send now.
+  const linkWasUsed = searchParams?.reason === "used" || searchParams?.error === "1";
+
   return (
     <main>
       <header className="sticky top-0 z-40 border-b border-indigo/10 bg-ivory/90 backdrop-blur">
@@ -38,8 +57,17 @@ export default function LoginPage() {
             <p className="mx-auto mt-3 max-w-sm text-[16px] leading-relaxed text-indigo/75">
               Sign in to pick up your Command Shift — your progress and journals, saved across devices.
             </p>
+            {linkWasUsed && (
+              <div className="mx-auto mt-6 max-w-md rounded-2xl border border-gold/45 bg-gold/[0.07] px-5 py-4 text-left">
+                <p className="text-[13px] font-semibold text-indigo">That link has already been used.</p>
+                <p className="mt-1.5 text-[13.5px] leading-relaxed text-indigo/75">
+                  Sign-in links work once, to keep your journal private. Pop your email in below and
+                  we&apos;ll send a fresh one — you&apos;ll land right back where you left off.
+                </p>
+              </div>
+            )}
           </div>
-          <LoginForm />
+          <LoginForm next={next} />
         </div>
       </section>
     </main>

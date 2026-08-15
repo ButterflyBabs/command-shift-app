@@ -49,5 +49,18 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL(next, url.origin));
     }
   }
-  return NextResponse.redirect(new URL("/login?error=1", url.origin));
+  // The link didn't verify. That is almost always a link being opened a second
+  // time — magic links are single-use by design. If this browser still has a
+  // valid session, the reuse is harmless: send them where they were going
+  // instead of bouncing them to a sign-in page they don't need.
+  try {
+    const supabase = createClient();
+    const { data } = await supabase.auth.getUser();
+    if (data.user) return NextResponse.redirect(new URL(next, url.origin));
+  } catch {
+    /* fall through to the sign-in page */
+  }
+  return NextResponse.redirect(
+    new URL(`/login?reason=used&next=${encodeURIComponent(next)}`, url.origin)
+  );
 }
