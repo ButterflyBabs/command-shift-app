@@ -29,8 +29,10 @@ const EMPTY: Fields = { firstName: "", lastName: "", city: "", state: "", zip: "
  */
 function formatPhone(value: string): string {
   let raw = value.replace(/\D/g, "");
-  // Someone pasting "+1 (303) 555-1234" shouldn't end up with (130) 355-5123.
-  if (raw.length === 11 && raw.startsWith("1")) raw = raw.slice(1);
+  // Drop a leading country code, whether it arrives by paste ("+1 (303) 555-1234")
+  // or by someone simply typing 1 first. No US area code begins with 1, so a
+  // leading 1 on an over-length number is always the country code.
+  if (raw.length > 10 && raw.startsWith("1")) raw = raw.slice(1);
   const d = raw.slice(0, 10);
   if (d.length < 4) return d;
   if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
@@ -188,7 +190,7 @@ export function RegisterForm() {
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="phone" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Mobile number</label>
-          <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={setPhone} autoComplete="tel" inputMode="tel" maxLength={14} placeholder="(555) 555-5555" required />
+          <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={setPhone} autoComplete="tel" inputMode="tel" placeholder="(555) 555-5555" required />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="city" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">City</label>
