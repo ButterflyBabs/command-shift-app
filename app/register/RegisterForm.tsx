@@ -4,23 +4,14 @@ import { useState } from "react";
 import { Emblem } from "../components/icons";
 import { createClient } from "@/lib/supabase/client";
 
-const US_STATES = [
-  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-  "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-  "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC",
-];
-
 type Fields = {
   firstName: string;
   lastName: string;
-  city: string;
-  state: string;
-  zip: string;
   phone: string;
   email: string;
 };
 
-const EMPTY: Fields = { firstName: "", lastName: "", city: "", state: "", zip: "", phone: "", email: "" };
+const EMPTY: Fields = { firstName: "", lastName: "", phone: "", email: "" };
 
 /**
  * Format a US mobile number as (555) 555-5555 while it's being typed.
@@ -108,9 +99,6 @@ export function RegisterForm() {
               first_name: f.firstName,
               last_name: f.lastName,
               phone: digits,
-              city: f.city,
-              state: f.state,
-              zip: f.zip,
             },
           },
         });
@@ -191,23 +179,6 @@ export function RegisterForm() {
         <div className="sm:col-span-2">
           <label htmlFor="phone" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Mobile number</label>
           <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={setPhone} autoComplete="tel" inputMode="tel" placeholder="(555) 555-5555" required />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="city" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">City</label>
-          <input id="city" className={inputCls} value={f.city} onChange={set("city")} autoComplete="address-level2" placeholder="City" required />
-        </div>
-        <div>
-          <label htmlFor="state" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">State</label>
-          <select id="state" className={inputCls} value={f.state} onChange={set("state")} autoComplete="address-level1" required>
-            <option value="" disabled>Select…</option>
-            {US_STATES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="zip" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Zip code</label>
-          <input id="zip" className={inputCls} value={f.zip} onChange={set("zip")} autoComplete="postal-code" inputMode="numeric" placeholder="ZIP" required />
         </div>
       </div>
 
