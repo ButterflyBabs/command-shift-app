@@ -22,6 +22,24 @@ type Fields = {
 
 const EMPTY: Fields = { firstName: "", lastName: "", city: "", state: "", zip: "", phone: "", email: "" };
 
+/**
+ * Format a US mobile number as (555) 555-5555 while it's being typed.
+ * Punctuation is only added once there are enough digits to justify it, so
+ * backspacing never gets stuck on a bracket the user can't delete.
+ */
+function formatPhone(value: string): string {
+  let raw = value.replace(/\D/g, "");
+  // Someone pasting "+1 (303) 555-1234" shouldn't end up with (130) 355-5123.
+  if (raw.length === 11 && raw.startsWith("1")) raw = raw.slice(1);
+  const d = raw.slice(0, 10);
+  if (d.length < 4) return d;
+  if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+}
+
+/** Strip the mask back to bare digits for the CRM and Supabase. */
+const phoneDigits = (value: string) => value.replace(/\D/g, "");
+
 /** Best-effort "open your inbox" link based on the email's provider. */
 function inboxLink(email: string): { label: string; href: string } | null {
   const d = (email.split("@")[1] || "").toLowerCase();
@@ -44,6 +62,9 @@ export function RegisterForm() {
   const set = (k: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setF((prev) => ({ ...prev, [k]: e.target.value }));
 
+  const setPhone = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setF((prev) => ({ ...prev, phone: formatPhone(e.target.value) }));
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -56,13 +77,20 @@ export function RegisterForm() {
       setError("Please enter a valid email address.");
       return;
     }
+    const digits = phoneDigits(f.phone);
+    if (digits.length !== 10) {
+      setError("Please enter a 10-digit mobile number, like (555) 555-5555.");
+      return;
+    }
     setStatus("busy");
+    // Send bare digits onward — the mask is for the person, not the database.
+    const payload = { ...f, phone: digits };
     try {
       // 1) Marketing/CRM: fire the Global Control tag + write contact fields (best-effort).
       await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(f),
+        body: JSON.stringify(payload),
       });
       // 2) Account: create the shared Supabase identity + email a magic link.
       //    Their details ride along as user_metadata; progress saves once they sign in.
@@ -77,7 +105,7 @@ export function RegisterForm() {
             data: {
               first_name: f.firstName,
               last_name: f.lastName,
-              phone: f.phone,
+              phone: digits,
               city: f.city,
               state: f.state,
               zip: f.zip,
@@ -160,7 +188,7 @@ export function RegisterForm() {
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="phone" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Mobile number</label>
-          <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={set("phone")} autoComplete="tel" placeholder="(555) 555-5555" required />
+          <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={setPhone} autoComplete="tel" inputMode="tel" maxLength={14} placeholder="(555) 555-5555" required />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="city" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">City</label>
