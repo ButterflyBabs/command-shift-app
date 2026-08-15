@@ -489,7 +489,7 @@ export function DayView({ day }: { day: Day }) {
     },
     nudge: {
       num: 7,
-      title: "Text Nudge",
+      title: "Daily Nudge",
       body: (
         <div className="flex items-start gap-3">
           <IconChat className="h-9 w-9 flex-none text-gold" />

@@ -6,7 +6,7 @@ import { RegisterForm } from "./RegisterForm";
 export const metadata: Metadata = {
   title: "Register — The Command Shift 21-Day Challenge",
   description:
-    "Join the free Command Shift 21-day challenge. Trade the scramble for one clear command center — one small aligned move a day, by email and text.",
+    "Join the free Command Shift 21-day challenge. Trade the scramble for one clear command center — one small aligned move a day, by email.",
 };
 
 export default function RegisterPage() {

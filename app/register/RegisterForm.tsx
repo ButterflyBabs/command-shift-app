@@ -159,7 +159,7 @@ export function RegisterForm() {
           <input id="email" type="email" className={inputCls} value={f.email} onChange={set("email")} autoComplete="email" placeholder="you@example.com" required />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="phone" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Mobile number <span className="font-normal text-indigo/50">(for your daily text nudge)</span></label>
+          <label htmlFor="phone" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Mobile number</label>
           <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={set("phone")} autoComplete="tel" placeholder="(555) 555-5555" required />
         </div>
         <div className="sm:col-span-2">
@@ -191,7 +191,7 @@ export function RegisterForm() {
         {status === "busy" ? "Reserving your spot…" : "Start the free challenge →"}
       </button>
       <p className="mt-4 text-center text-xs leading-relaxed text-indigo/55">
-        Free forever · Day 1 arrives in minutes by email and text · Unsubscribe anytime · Reply STOP to opt out of texts.
+        Free forever · Day 1 arrives in minutes by email · Unsubscribe anytime.
       </p>
     </form>
   );
