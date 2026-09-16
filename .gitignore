@@ -9,3 +9,7 @@ npm-debug.log*
 .vercel
 next-env.d.ts
 /.turbo
+
+# Daily audio now lives in Supabase Storage (challenge-audio bucket), not git —
+# see lib/content.ts's audioUrl fields. Never commit real recordings here again.
+/public/audio
