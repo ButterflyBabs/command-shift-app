@@ -39,7 +39,7 @@ export default function RegisterPage() {
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-[17px] leading-relaxed text-indigo/75">
               Twenty-one days from a scattered hustle to hard-won harmony. One small aligned move a day, delivered by
-              email and text, with a daily audio from your Alignment Architect.
+              email, with a daily audio from your Alignment Architect.
             </p>
           </div>
 

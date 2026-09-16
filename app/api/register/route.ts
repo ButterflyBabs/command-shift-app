@@ -48,9 +48,9 @@ export async function POST(req: Request) {
   const firstName = (body.firstName || "").trim();
   const lastName = (body.lastName || "").trim();
   const email = (body.email || "").trim();
-  const phone = (body.phone || "").trim();
+  const phone = (body.phone || "").trim(); // optional — kept for sales follow-up, not required
 
-  const missing = Object.entries({ firstName, lastName, email, phone })
+  const missing = Object.entries({ firstName, lastName, email })
     .filter(([, v]) => !v)
     .map(([k]) => k);
   if (missing.length) {
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     const gcRes = await fetch(`${GC_FORM_BASE}/${encodeURIComponent(tagId)}`, {
       method: "POST",
       headers,
-      body: JSON.stringify({ email, firstName, lastName, phone }),
+      body: JSON.stringify({ email, firstName, lastName, ...(phone ? { phone } : {}) }),
     });
 
     const payload = await gcRes.json().catch(() => null);

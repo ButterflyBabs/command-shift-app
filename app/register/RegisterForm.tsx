@@ -61,7 +61,9 @@ export function RegisterForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const missing = (Object.keys(f) as (keyof Fields)[]).filter((k) => !f[k].trim());
+    // Phone is optional — everyone else is required so we can send daily lessons.
+    const requiredFields: (keyof Fields)[] = ["firstName", "lastName", "email"];
+    const missing = requiredFields.filter((k) => !f[k].trim());
     if (missing.length) {
       setError("Please complete every field so we can send your daily lessons.");
       return;
@@ -71,8 +73,8 @@ export function RegisterForm() {
       return;
     }
     const digits = phoneDigits(f.phone);
-    if (digits.length !== 10) {
-      setError("Please enter a 10-digit mobile number, like (555) 555-5555.");
+    if (digits.length > 0 && digits.length !== 10) {
+      setError("Please enter a 10-digit mobile number, like (555) 555-5555 — or leave it blank.");
       return;
     }
     setStatus("busy");
@@ -177,8 +179,8 @@ export function RegisterForm() {
           <input id="email" type="email" className={inputCls} value={f.email} onChange={set("email")} autoComplete="email" placeholder="you@example.com" required />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="phone" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Mobile number</label>
-          <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={setPhone} autoComplete="tel" inputMode="tel" placeholder="(555) 555-5555" required />
+          <label htmlFor="phone" className="mb-1.5 block text-[13px] font-semibold text-indigo/80">Mobile number (optional)</label>
+          <input id="phone" type="tel" className={inputCls} value={f.phone} onChange={setPhone} autoComplete="tel" inputMode="tel" placeholder="(555) 555-5555" />
         </div>
       </div>
 
