@@ -1,3 +1,4 @@
+import { Tracking } from "@/components/Tracking";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -24,7 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        {children}
+        <Tracking />
+      </body>
     </html>
   );
 }

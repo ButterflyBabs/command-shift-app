@@ -1,4 +1,5 @@
 "use client";
+import { trackEvent } from "@/components/Tracking";
 
 import { useState } from "react";
 import { Emblem } from "../components/icons";
@@ -107,6 +108,7 @@ export function RegisterForm() {
       } catch {
         /* account creation is best-effort; they can still start now */
       }
+      trackEvent("CompleteRegistration", { content_name: "command_shift_challenge" });
       setStatus("done");
     } catch {
       setStatus("done");
