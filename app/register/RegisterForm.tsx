@@ -131,13 +131,13 @@ export function RegisterForm() {
         <div className="mt-5 rounded-2xl border border-gold/40 bg-gold/[0.06] px-5 py-4 text-left">
           <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-gold">Look for this email</p>
           <p className="mt-2 text-[14px] leading-relaxed text-indigo/85">
-            <span className="text-indigo/60">From:</span> <strong>The Command Shift</strong> ·
-            community@lccommandsuite.com
+            <span className="text-indigo/60">From:</span> <strong>LifeCharter Command Shift</strong> ·
+            support@lccommandsuite.com
             <br />
             <span className="text-indigo/60">Subject:</span> <strong>Confirm your sign-in</strong>
           </p>
           <p className="mt-3 rounded-xl border border-teal/30 bg-teal/[0.07] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-indigo/85">
-            ⭐ <strong>Add community@lccommandsuite.com to your contacts</strong> (or tap &ldquo;Not spam&rdquo; if it
+            ⭐ <strong>Add support@lccommandsuite.com to your contacts</strong> (or tap &ldquo;Not spam&rdquo; if it
             lands there) so every day&apos;s email reaches your inbox.
           </p>
           <p className="mt-2 text-[12.5px] leading-relaxed text-indigo/55">
