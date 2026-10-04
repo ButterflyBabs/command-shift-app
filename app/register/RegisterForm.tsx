@@ -38,7 +38,7 @@ const phoneDigits = (value: string) => value.replace(/\D/g, "");
 function inboxLink(email: string): { label: string; href: string } | null {
   const d = (email.split("@")[1] || "").toLowerCase();
   if (d.includes("gmail") || d.includes("googlemail"))
-    return { label: "Open Gmail", href: "https://mail.google.com/mail/u/0/#search/from%3A(lccssupport%40amilynnecarroll.com)" };
+    return { label: "Open Gmail", href: "https://mail.google.com/mail/u/0/#search/from%3A(support%40lccommandsuite.com)" };
   if (d.includes("outlook") || d.includes("hotmail") || d.includes("live") || d.includes("msn"))
     return { label: "Open Outlook", href: "https://outlook.live.com/mail/0/" };
   if (d.includes("yahoo")) return { label: "Open Yahoo Mail", href: "https://mail.yahoo.com/" };
