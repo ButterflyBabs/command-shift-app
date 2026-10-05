@@ -1,31 +1,22 @@
 import { NextResponse } from "next/server";
 
 /**
- * The Command Shift — registration → Global Control.
+ * The Command Shift — registration → the Command Suite's own CRM.
  *
- * Submits the contact to the challenge tag's form endpoint, which creates or
- * updates them by email and enrols them in the 21-day workflow.
+ * Posts the registrant to the Suite form "Command Shift Challenge registration", which creates
+ * or updates the contact by email, tags them command-shift-registered and starts the Command
+ * Shift daily-email campaign (welcome, Day 1 to Day 21, next doorway). Until 2026-10-05 this
+ * tagged Global Control instead; that workflow is retired.
  *
- * Configuration (Vercel env vars — nothing is hard-coded or exposed to the browser):
- *   GC_CHALLENGE_TAG_ID   id of the "lccs-challenge" tag that triggers the workflow
- *   GC_FORM_BASE          optional override of the submission endpoint
- *   GLOBAL_CONTROL_API_KEY optional; sent as X-API-KEY when present
+ * Configuration (optional Vercel env vars; the defaults below are the live form):
+ *   SUITE_FORM_BASE   the Suite's public form endpoint
+ *   SUITE_FORM_ID     id of the registration form in the Suite
  *
- * Verified against the live API on 2026-08-15:
- *   - POST /api/tag-form-submission/{tagId} works and needs no auth header.
- *   - The older /api/ai/tags/fire-tag/{tagId} returns HTTP 200 with an ERROR body
- *     ({"type":"error",...}), so any check based on res.ok reads failure as success.
- *     That is why this integration appeared to work while capturing nobody.
- *   - The endpoint accepts email, firstName, lastName and phone. Anything else —
- *     city, state, zip, nested customFields — is silently discarded, and Global
- *     Control has no native zip field at all. So we send only what it stores.
- *
- * Diagnostic: POST with ?debug=<DIAG_TOKEN> returns a NON-SECRET report of the
- * round-trip. It never exposes the API key or any other contact's data.
+ * Diagnostic: POST with ?debug=<DIAG_TOKEN> returns a NON-SECRET report of the round-trip.
  */
 
-const GC_FORM_BASE =
-  process.env.GC_FORM_BASE || "https://api.globalcontrol.io/api/tag-form-submission";
+const SUITE_FORM_BASE = process.env.SUITE_FORM_BASE || "https://lccommandsuite.com/api/forms";
+const SUITE_FORM_ID = process.env.SUITE_FORM_ID || "f3130be5-9b35-4f58-9fad-a4bc2cca6428";
 const DIAG_TOKEN = "lccsdiag-7Q2v9x";
 
 type Payload = {
@@ -60,51 +51,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "invalid_email" }, { status: 400 });
   }
 
-  const tagId = process.env.GC_CHALLENGE_TAG_ID;
-
-  // A missing tag id is a configuration fault, not the participant's problem.
-  // Let them through, but make the fault impossible to miss in the Vercel logs.
-  if (!tagId) {
-    console.error(
-      `[register] NOT CONFIGURED — GC_CHALLENGE_TAG_ID is unset. Lead lost: ${email}`
-    );
-    const res = { ok: true, crm: "not_configured" as const };
-    return NextResponse.json(debug ? { ...res, debug: { hasTagId: false } } : res);
-  }
-
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (process.env.GLOBAL_CONTROL_API_KEY) {
-    headers["X-API-KEY"] = process.env.GLOBAL_CONTROL_API_KEY;
-  }
-
+  // The Suite's own CRM (since 2026-10-05; this used to tag Global Control). The form saves the
+  // contact, tags them command-shift-registered and starts the Command Shift daily emails.
   try {
-    const gcRes = await fetch(`${GC_FORM_BASE}/${encodeURIComponent(tagId)}`, {
+    const res = await fetch(`${SUITE_FORM_BASE}/${SUITE_FORM_ID}`, {
       method: "POST",
-      headers,
-      body: JSON.stringify({ email, firstName, lastName, ...(phone ? { phone } : {}) }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ first_name: firstName, last_name: lastName, email, ...(phone ? { phone } : {}), _page: "https://command-shift-app.vercel.app/register" }),
     });
-
-    const payload = await gcRes.json().catch(() => null);
-
-    // Global Control returns HTTP 200 for failures and puts the real outcome in
-    // the body. Success is {"type":"response","data":{"success":true}}. So we must
-    // REQUIRE an explicit success — checking gcRes.ok passes on an error body.
-    const succeeded = gcRes.ok && payload?.data?.success === true;
-
-    if (!succeeded) {
-      console.error(
-        `[register] TAG SUBMIT FAILED for ${email} (status=${gcRes.status}) ` +
-          `response=${JSON.stringify(payload)}`
-      );
-      const res = { ok: true, crm: "failed" as const, status: gcRes.status };
-      return NextResponse.json(debug ? { ...res, debug: { payload } } : res);
+    const payload = await res.json().catch(() => null);
+    if (!res.ok || payload?.ok !== true) {
+      console.error(`[register] SUITE FORM FAILED for ${email} (status=${res.status}) response=${JSON.stringify(payload)}`);
+      const out = { ok: true, crm: "failed" as const, status: res.status };
+      return NextResponse.json(debug ? { ...out, debug: { payload } } : out);
     }
-
-    const res = { ok: true, crm: "registered" as const };
-    return NextResponse.json(debug ? { ...res, debug: { payload } } : res);
+    const out = { ok: true, crm: "registered" as const };
+    return NextResponse.json(debug ? { ...out, debug: { payload } } : out);
   } catch (err) {
-    console.error(`[register] TAG SUBMIT ERROR for ${email}:`, err);
-    const res = { ok: true, crm: "error" as const };
-    return NextResponse.json(debug ? { ...res, debug: { message: String(err) } } : res);
+    console.error(`[register] SUITE FORM ERROR for ${email}:`, err);
+    const out = { ok: true, crm: "error" as const };
+    return NextResponse.json(debug ? { ...out, debug: { message: String(err) } } : out);
   }
 }
