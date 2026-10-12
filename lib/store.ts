@@ -188,9 +188,19 @@ export async function getStartDate(uid: string | null): Promise<string> {
     if (data?.start_date) {
       try {
         localStorage.setItem("cs_start", data.start_date as string);
+        // Remember whose start date this is, so another account signing in on
+        // this browser never inherits it.
+        localStorage.setItem("cs_start_uid", uid);
       } catch {}
       return data.start_date as string;
     }
+    try {
+      const owner = localStorage.getItem("cs_start_uid");
+      if (owner && owner !== uid) {
+        localStorage.removeItem("cs_start");
+        localStorage.removeItem("cs_start_uid");
+      }
+    } catch {}
   }
   try {
     let d = localStorage.getItem("cs_start");

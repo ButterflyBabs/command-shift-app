@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { upsertParticipant } from "@/lib/participant";
 
 /**
  * Magic-link callback. Exchanges the code for a session, upserts the
@@ -17,23 +18,7 @@ export async function GET(request: Request) {
     if (!error) {
       const { data } = await supabase.auth.getUser();
       const u = data.user;
-      if (u) {
-        const m = (u.user_metadata || {}) as Record<string, string>;
-        await supabase.from("cs_participants").upsert(
-          {
-            user_id: u.id,
-            first_name: m.first_name || null,
-            last_name: m.last_name || null,
-            email: u.email || m.email || null,
-            phone: m.phone || null,
-            city: m.city || null,
-            state: m.state || null,
-            zip: m.zip || null,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: "user_id" }
-        );
-      }
+      if (u) await upsertParticipant(supabase, u, request);
       return NextResponse.redirect(new URL(next, url.origin));
     }
   }
